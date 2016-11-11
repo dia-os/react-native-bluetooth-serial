@@ -234,9 +234,10 @@ public class RCTBluetoothSerialModule extends ReactContextBaseJavaModule {
     public void writeToDevice(String message, Promise promise) {
         Log.d(TAG, "Write " + message);
         byte[] data = Base64.decode(message, Base64.DEFAULT);
-        bluetoothSerialService.write(data);
-        promise.resolve(true);
+        bluetoothSerialService.write(data,promise);
+        //promise.resolve(true);
     }
+
 
     @ReactMethod
     public void available(Promise promise) {
@@ -344,8 +345,8 @@ public class RCTBluetoothSerialModule extends ReactContextBaseJavaModule {
         if (reactContext.hasActiveCatalystInstance()) {
             Log.d(TAG, "Sending event");
             reactContext
-            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-            .emit(eventName, params);
+                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                    .emit(eventName, params);
         }
     }
 

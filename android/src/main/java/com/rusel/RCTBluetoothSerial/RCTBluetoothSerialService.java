@@ -12,6 +12,8 @@ import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
+import com.facebook.react.bridge.Promise;
+
 /**
  * This class does all the work for setting up and managing Bluetooth
  * connections with other devices. It has a thread that listens for
@@ -196,7 +198,7 @@ public class RCTBluetoothSerialService {
      * @param out The bytes to write
      * @see ConnectedThread#write(byte[])
      */
-    public void write(byte[] out) {
+    public void write(byte[] out,Promise promise) {
         // Create temporary object
         ConnectedThread r;
         Log.d(TAG, "Write in service, state is " + STATE_CONNECTED);
@@ -207,7 +209,7 @@ public class RCTBluetoothSerialService {
             r = mConnectedThread;
         }
         // Perform the write unsynchronized
-        r.write(out);
+        r.write(out,promise);
     }
 
     /**
@@ -461,16 +463,17 @@ public class RCTBluetoothSerialService {
          * Write to the connected OutStream.
          * @param buffer  The bytes to write
          */
-        public void write(byte[] buffer) {
+        public void write(byte[] buffer,Promise promise) {
             try {
                 String str = new String(buffer, "UTF-8");
                 Log.d(TAG, "Write in thread " + str);
                 mmOutStream.write(buffer);
-
+                promise.resolve(true);
                 // Share the sent message back to the UI Activity
                 //mModule.receiveMessage(RCTBluetoothSerialModule.MESSAGE_WRITE, buffer);
 
-            } catch (IOException e) {
+            } catch (Exception e) {
+                promise.reject("error during write 11");
                 Log.e(TAG, "Exception during write", e);
             }
         }
